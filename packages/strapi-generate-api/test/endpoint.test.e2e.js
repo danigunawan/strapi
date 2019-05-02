@@ -145,6 +145,33 @@ describe('Create Strapi API End to End', () => {
       expect(body.name).toBe('tag3');
     });
 
+    test('Filter on created_at', async () => {
+      const { body } = await rq({
+        method: 'GET',
+        url: `/tags`,
+        qs: {
+          created_at: data.tags[0].created_at,
+        },
+      });
+
+      expect(Array.isArray(body)).toBe(true);
+      expect(body.length).toBe(1);
+      expect(body[0].id).toBe(data.tags[0].id);
+    });
+
+    test('Filter on updated_at', async () => {
+      const { body } = await rq({
+        method: 'GET',
+        url: `/tags`,
+        qs: {
+          updated_at_gte: data.tags[0].created_at,
+        },
+      });
+
+      expect(Array.isArray(body)).toBe(true);
+      expect(body.length).toBe(3);
+    });
+
     test('Create article1 without relation', async () => {
       const entry = {
         title: 'Article 1',

@@ -293,6 +293,60 @@ describe('Test Graphql Relations API End to End', () => {
       data.labels = res.body.data.labels;
     });
 
+    test('Filter on created_at', async () => {
+      const res = await graphqlQuery({
+        query: /* GraphQL */ `
+          query getDocs($date: String) {
+            documents(where: { created_at_lte: $date }) {
+              id
+              name
+              labels {
+                id
+                name
+              }
+            }
+          }
+        `,
+        variables: {
+          date: new Date().getTime().toString(),
+        },
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body).toMatchObject({
+        data: {
+          documents: data.documents,
+        },
+      });
+    });
+
+    test('Filter on updated_at', async () => {
+      const res = await graphqlQuery({
+        query: /* GraphQL */ `
+          query getDocs($date: String) {
+            documents(where: { updated_at_gte: $date }) {
+              id
+              name
+              labels {
+                id
+                name
+              }
+            }
+          }
+        `,
+        variables: {
+          date: (new Date().getTime() - 100000).toString(),
+        },
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body).toMatchObject({
+        data: {
+          documents: expect.arrayContaining(data.documents),
+        },
+      });
+    });
+
     test('Deep query', async () => {
       const res = await graphqlQuery({
         query: /* GraphQL */ `
